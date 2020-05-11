@@ -25,15 +25,11 @@ class FormScreen extends StatefulWidget {
 
 class FormScreenState extends State<FormScreen> {
   List<List<String>> arr = List.generate(4, (i) => List(4), growable: false);
-  static int row=0,col=0;
   
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  Widget _buildBox() {
-    int itsRow=row, itsCol=col;
-    if (row<=3 && col<3) col+=1;
-    else if (col>=3) {row+=1; col=0;}
+  Widget _buildBox(int row,int col) {
     return Container(
       height: 90,
       width: 70,
@@ -42,40 +38,45 @@ class FormScreenState extends State<FormScreen> {
           counterText:""
           ),
         showCursor: false,
-
         textCapitalization: TextCapitalization.characters,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 40,
         ),
         maxLength: 1,
+
         validator: (String value) {
           if (value.isEmpty) {
-            return '$itsRow , $itsCol';
+            return '$row , $col';
           }
-
           return null;
         },
+
         onSaved: (String value) {
-          arr[itsRow][itsCol] = value;
+          arr[row][col] = value;
         },
       ),
     );
   }
   
-  List <Widget> _rowOfBoxes(){
-    return <Widget>[
-                  _buildBox(),
-                  _buildBox(),
-                  _buildBox(),
-                  _buildBox(),
-                ];
+  Widget _rowOfBoxes(int row){
+    
+    return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  _buildBox(row,0),
+                  _buildBox(row,1),
+                  _buildBox(row,2),
+                  _buildBox(row,3),
+                ]
+    );
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Box"),
+        title: Center(child:Text("Input"),),
       ),
       body: Center(
         child: Form(
@@ -84,26 +85,11 @@ class FormScreenState extends State<FormScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _rowOfBoxes()
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _rowOfBoxes()
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _rowOfBoxes()
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _rowOfBoxes()
-              ),
+              _rowOfBoxes(0),
+              _rowOfBoxes(1),
+              _rowOfBoxes(2),
+              _rowOfBoxes(3),
+
               RaisedButton(
                 child: Text(
                   'Submit',
@@ -115,8 +101,6 @@ class FormScreenState extends State<FormScreen> {
                   }
 
                   _formKey.currentState.save();
-
-                  //Send to API
                 },
               )
             ],
@@ -124,7 +108,7 @@ class FormScreenState extends State<FormScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: null,
+        onPressed: ()=> print(arr),
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
